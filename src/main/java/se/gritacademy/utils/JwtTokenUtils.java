@@ -19,6 +19,15 @@ import java.util.stream.Collectors;
 public class JwtTokenUtils {
     @Value("QWQKEOKOKOKOQEQe565vv565vvvv5656566bjhjhjhjhjjjcxszszszszszszszszszszszszszs")
     private String secretKey;
+
+    public JwtTokenUtils() {
+    }
+
+    public JwtTokenUtils(String secretKey) {
+        this.secretKey = secretKey;
+    }
+
+
     public String generateJwtToken(UserInfo user) {
         Map<String, Object> claims = new HashMap<>();
         List<String> roleList = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());

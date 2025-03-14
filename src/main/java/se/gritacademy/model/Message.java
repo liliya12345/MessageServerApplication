@@ -12,5 +12,12 @@ public class Message {
     private Long id;
 
 
+    public Message(Long id) {
+        this.id = id;
+    }
+
+    public Message() {
+
+    }
 }
 

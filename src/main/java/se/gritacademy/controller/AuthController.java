@@ -29,6 +29,15 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    public AuthController() {
+    }
+
+    public AuthController(UserRepository userRepository, JwtTokenUtils jwtTokenUtils, UserService userService) {
+        this.userRepository = userRepository;
+        this.jwtTokenUtils = jwtTokenUtils;
+        this.userService = userService;
+    }
+
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestParam String email, @RequestParam String password) {
         if (userService.findByEmail(email).isPresent()) {

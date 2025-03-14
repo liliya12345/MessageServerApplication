@@ -25,6 +25,13 @@ public class UserInfo implements UserDetails {
 
     }
 
+    public UserInfo(Long id, String email, String password, Set<Role> userRoles) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.userRoles = userRoles;
+    }
+
     public String getEmail() { return email; }
 
     @Override
