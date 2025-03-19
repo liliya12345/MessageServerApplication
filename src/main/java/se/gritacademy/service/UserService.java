@@ -21,6 +21,9 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
+
+
+
     public UserService(UserRepository userRepository){
         this.userRepository = userRepository;
     }
@@ -37,6 +40,9 @@ public class UserService implements UserDetailsService {
     public List<String> findEmailUsers(){
         return userRepository.findAll().stream().map(UserInfo::getEmail).toList();
 
+    }
+    public List<UserInfo> findAll(){
+        return userRepository.findAll();
     }
 
 }

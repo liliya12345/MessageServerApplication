@@ -13,24 +13,39 @@ public class UserInfo implements UserDetails {
     private Long id;
     private String email;
     private String password;
+
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     private Set<Role> userRoles = new HashSet<>();
 
-    public UserInfo()  {}
-    public UserInfo(String email, String password, String role) {
-        this.email = email;
-        this.password = password;
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Message> sendMessageList;
 
-    }
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Message> recivedMessageList;
+
 
     public UserInfo(Long id, String email, String password, Set<Role> userRoles) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.userRoles = userRoles;
+
     }
+
+
+    public UserInfo()  {}
+
+    public UserInfo(Long id, String email, String password, Set<Role> userRoles, List<Message> sendMessageList, List<Message> recivedMessageList) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.userRoles = userRoles;
+        this.sendMessageList = sendMessageList;
+        this.recivedMessageList = recivedMessageList;
+    }
+
 
     public String getEmail() { return email; }
 
@@ -81,5 +96,31 @@ public class UserInfo implements UserDetails {
     }
 
 
+    public Long getId() {
+        return id;
+    }
 
+    public List<Message> getSendMessageList() {
+        return sendMessageList;
+    }
+
+    public void setSendMessageList(List<Message> sendMessageList) {
+        this.sendMessageList = sendMessageList;
+    }
+
+    public List<Message> getRecivedMessageList() {
+        return recivedMessageList;
+    }
+
+    public void setRecivedMessageList(List<Message> recivedMessageList) {
+        this.recivedMessageList = recivedMessageList;
+    }
+
+    public Set<Role> getUserRoles() {
+        return userRoles;
+    }
+
+    public void setUserRoles(Set<Role> userRoles) {
+        this.userRoles = userRoles;
+    }
 }

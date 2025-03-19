@@ -1,21 +1,18 @@
 package se.gritacademy.controller;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import se.gritacademy.model.Message;
+import se.gritacademy.model.Role;
 import se.gritacademy.model.UserInfo;
 import se.gritacademy.repository.UserRepository;
 import se.gritacademy.service.UserService;
 import se.gritacademy.utils.JwtTokenUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -43,7 +40,9 @@ public class AuthController {
         if (userService.findByEmail(email).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already in use");
         }
-        userService.save(new UserInfo(email, password, "user"));
+        Set<Role> roleSet =new HashSet<>();
+        roleSet.add(Role.ROLE_USER);
+        userService.save(new UserInfo(null,email, password, roleSet));
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 
@@ -61,36 +60,8 @@ public class AuthController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
     }
-    //del1...5
-    @GetMapping("/messages")
-    public ResponseEntity<List<Message>> getMessages(@RequestHeader("Authorization") String token) {
-        Claims claims = jwtTokenUtils.parseJwtToken(token.replace("Bearer ", ""));
 
 
-        return ResponseEntity.ok(null);
-    }
-    //del1
-    @GetMapping("/users")
-    public ResponseEntity<List<String>> getUsers(@RequestHeader("Authorization") String token) {
-        Claims bearer = jwtTokenUtils.parseJwtToken(token.replace("Bearer ", ""));
-        String role = bearer.get("role").toString();
-        if(role.equals("admin")) {
-            return ResponseEntity.ok(userService.findEmailUsers());
-        }
-
-        return ResponseEntity.ok(null);
-    }
-    //del1
-    @PostMapping("/messages")
-    public ResponseEntity<String> sendMessage(@RequestHeader("Authorization") String token, @RequestParam String recipient, @RequestParam String message) {
-        Claims claims = jwtTokenUtils.parseJwtToken(token.replace("Bearer ", ""));
-        ArrayList<String> messagesList = new ArrayList<>();
-
-
-
-
-        return ResponseEntity.ok("Not implemented yet");
-    }
 
     @GetMapping("/logout")
     public ResponseEntity<String> logout() {

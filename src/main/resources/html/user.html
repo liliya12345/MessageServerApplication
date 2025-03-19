@@ -135,16 +135,46 @@
         }
 
         function loadMessages() {
-            fetch('http://localhost:8080/api/messages', { headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` }})
-            .then(res => res.json())
-            .then(data => {
-                const list = document.getElementById('messages-list');
-                list.innerHTML = '';
-                data.forEach(msg => {
-                    list.innerHTML += `<li><b>${msg.date}</b> - ${msg.sender}: ${msg.message}</li>`;
+            const jwt = localStorage.getItem('jwt');
+            if (!jwt) {
+                alert('You are not logged in. Redirecting to login page...');
+                window.location.href = '/login'; // Redirect to login page
+                return;
+            }
+
+            const list = document.getElementById('messages-list');
+            list.innerHTML = '<li>Loading messages...</li>'; // Show loading state
+
+            fetch('http://localhost:8080/api/messages', {
+                headers: {
+                    'Authorization': `Bearer ${jwt}`
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    list.innerHTML = ''; // Clear the loading state
+                    data.forEach(msg => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<b>${msg.date}</b> - ${msg.sender}: ${msg.message}`;
+                        list.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading messages:', error);
+                    list.innerHTML = '<li>Failed to load messages. Please try again later.</li>'; // Show error state
                 });
-            });
         }
+
+        // Refresh messages every 5 seconds
+        setInterval(loadMessages, 50000);
+
+        // Load messages immediately when the page loads
+        loadMessages();
         
         function loadUsers() {
             fetch('http://localhost:8080/api/users', { headers: { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` }})

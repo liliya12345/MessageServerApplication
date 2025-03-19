@@ -33,21 +33,47 @@ public class SecurityConfig {
         this.jwtRequestFilter = jwtRequestFilter;
     }
 
+    //    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//
+//
+//                .csrf(csrf -> csrf
+//                        .ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")))// Disable CSRF
+//                .cors(Customizer.withDefaults())
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
+//                        .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
+//                        .requestMatchers("/api/login", "/api/register", "/api/logout").permitAll() // Public endpoints
+//                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN") // Role-based access
+//                        .anyRequest().authenticated() // All other endpoints require authentication
+//                )
+//
+//                .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless session
+//                )
+//                .exceptionHandling(exception -> exception
+//                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)) // Handle unauthorized requests
+//                )
+//                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter
+//
+//        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
+//        return http.build();
+//    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
 
-
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")))// Disable CSRF
+                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
                         .requestMatchers("/api/login", "/api/register", "/api/logout").permitAll() // Public endpoints
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN") // Role-based access
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // Role-based access
+                        .requestMatchers("/api/admin/delete").hasRole("ADMIN") // Role-based access
                         .anyRequest().authenticated() // All other endpoints require authentication
                 )
-
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless session
                 )
@@ -56,9 +82,11 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter
 
-        // Allow H2 console to be displayed in frames (only for development)
-        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
-//        http.headers(header -> header.addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Origin", "*")));
+        http.headers(header -> header
+                .frameOptions(frame -> frame
+                        .sameOrigin() // Allow frames from the same origin (for H2 console)
+                )
+        );
         return http.build();
     }
 
