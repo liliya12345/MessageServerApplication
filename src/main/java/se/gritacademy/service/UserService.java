@@ -2,11 +2,14 @@ package se.gritacademy.service;
 
 import jdk.jfr.Enabled;
 import org.mindrot.jbcrypt.BCrypt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import se.gritacademy.controller.AuthController;
 import se.gritacademy.model.UserInfo;
 import se.gritacademy.repository.UserRepository;
 
@@ -16,13 +19,14 @@ import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException(username));
+        UserInfo userInfo = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException(username));
+        logger.info("User found with username: {}", username);
+        return userInfo;
     }
-
-
-
 
     public UserService(UserRepository userRepository){
         this.userRepository = userRepository;

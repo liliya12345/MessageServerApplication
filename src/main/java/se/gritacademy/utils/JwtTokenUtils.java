@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtils {
-    @Value("QWQKEOKOKOKOQEQe565vv565vvvv5656566bjhjhjhjhjjjcxszszszszszszszszszszszsz")
+    @Value("${secretkey}")
     private String secretKey;
 
     public JwtTokenUtils() {
